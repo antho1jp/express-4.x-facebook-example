@@ -8,6 +8,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
+var googAuthRouter = require('./routes/googauth');
 var myaccountRouter = require('./routes/myaccount');
 
 var app = express();
@@ -31,12 +32,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // next lines initialize Passport and authenticate the request based on session
 // data.  If session data contains a logged in user, the user is set at
 // `req.user`.
-app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(require('express-session')({ secret: process.env['MY_CLIENT_SECRET'], resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+// unauthenticated routes
 app.use('/', indexRouter);
+
+// authentication
 app.use('/', authRouter);
+app.use('/', googAuthRouter);
+
+// authenticated routes
 app.use('/myaccount', myaccountRouter);
 
 module.exports = app;
